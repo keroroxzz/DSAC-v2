@@ -1,8 +1,8 @@
 from typing import Optional,Union
 import numpy as np
-import gym
-from gym.core import ObsType, ActType
-from gym.wrappers.time_limit import TimeLimit
+import gymnasium as gym
+from gymnasium.core import ObsType, ActType
+from gymnasium.wrappers.common import TimeLimit
 from typing import Tuple
 
 
@@ -41,10 +41,10 @@ class ShapingRewardData(gym.Wrapper):
         self.reward_scale = reward_scale
 
     def step(self, action: ActType) -> Tuple[ObsType, float, bool, dict]:
-        obs, r, d, info = self.env.step(action)
+        obs, r, t1, t2, info = self.env.step(action)
         r_scaled = (r + self.reward_shift) * self.reward_scale
         info["raw_reward"] = r
-        return obs, r_scaled, d, info
+        return obs, r_scaled, t1, t2, info
 
 class StateData(gym.Wrapper):
     """
@@ -62,9 +62,9 @@ class StateData(gym.Wrapper):
         return obs, info
 
     def step(self, action: ActType) -> Tuple[ObsType, float, bool, dict]:
-        obs, rew, done, info = super(StateData, self).step(action)
+        obs, rew, t1, t2, info = super(StateData, self).step(action)
         self.current_obs = obs
-        return obs, rew, done, info
+        return obs, rew, t1, t2, info
 
     @property
     def state(self):
@@ -144,11 +144,11 @@ class ScaleObservationData(gym.Wrapper):
         info["raw_obs"] = obs
         return obs_scaled, info
 
-    def step(self, action: ActType) -> Tuple[ObsType, float, bool, dict]:
-        obs, r, d, info = self.env.step(action)
+    def step(self, action: ActType) -> Tuple[ObsType, float, bool, bool, dict]:
+        obs, r, t1, t2, info = self.env.step(action)
         obs_scaled = self.observation(obs)
         info["raw_obs"] = obs
-        return obs_scaled, r, d, info
+        return obs_scaled, r, t1, t2, info
 
 class ConvertType(gym.Wrapper):
     """Wrapper converts data type of action and observation to satisfy requirements of original
@@ -169,6 +169,6 @@ class ConvertType(gym.Wrapper):
 
     def step(self, action: ActType) -> Tuple[ObsType, float, bool, dict]:
         action = action.astype(self.act_data_type)
-        obs, rew, done, info = super(ConvertType, self).step(action)
+        obs, rew, terminations, truncations, info = super(ConvertType, self).step(action)
         obs = obs.astype(self.gops_data_type)
-        return obs, rew, done, info
+        return obs, rew, terminations, truncations, info

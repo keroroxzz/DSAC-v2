@@ -2,7 +2,7 @@ import importlib
 import os.path
 import sys
 
-import gym
+import gymnasium as gym
 from wrapping_env import wrapping_env
 
 

@@ -1,8 +1,8 @@
-import gym
+import gymnasium as gym
 import numpy as np
-from gym.wrappers.atari_preprocessing import AtariPreprocessing
-from gym.wrappers.frame_stack import FrameStack
-from gym.wrappers.transform_reward import TransformReward
+from gymnasium.wrappers.atari_preprocessing import AtariPreprocessing
+from gymnasium.wrappers.frame_stack import FrameStack
+from gymnasium.wrappers.transform_reward import TransformReward
 
 
 class FireResetEnv(gym.Wrapper):
@@ -41,8 +41,8 @@ class ModifiedFrameStack(FrameStack):
         super().__init__(env, stack_num)
 
     def step(self, action):
-        obs, reward, done, info = super().step(action)
-        return obs[:], reward, done, info
+        obs, reward, t1, t2, info = super().step(action)
+        return obs[:], reward, t1, t2, info
 
     def reset(self, **kwargs):
         return super().reset(**kwargs)[:]

@@ -109,7 +109,7 @@ def change_type(obj):
         return int(obj)
     elif isinstance(obj, type):
         return str(obj)
-    elif isinstance(obj, (np.float_, np.float16, np.float32, np.float64)):
+    elif isinstance(obj, (np.float16, np.float32, np.float64)):
         return float(obj)
     elif isinstance(obj, (np.ndarray,)):
         return obj.tolist()
@@ -158,7 +158,7 @@ def seed_everything(seed: Optional[int] = None) -> int:
 
 def set_seed(trainer_name, seed, offset, env=None):
     if env is not None:
-        env.seed(seed)
+        env.myseed = seed
     return None, env
 
 class ModuleOnDevice:

@@ -1,6 +1,9 @@
 import argparse
 import os
 #import numpy as np
+import sys
+
+sys.path.append("/home/rtu/gym_plaground/DSAC-v2/")
 
 from utils.initialization import create_alg,create_buffer,create_env
 from training.evaluator import create_evaluator
@@ -8,6 +11,7 @@ from training.off_sampler import create_sampler
 from training.trainer import create_trainer
 from utils.init_args import init_args
 from utils.tensorboard_setup import start_tensorboard, save_tb_to_csv
+from utils.plot_evaluation import plot_all
 
 os.environ["OMP_NUM_THREADS"] = "4"
 
@@ -67,7 +71,7 @@ if __name__ == "__main__":
         help="Options: default/TanhGaussDistribution/GaussDistribution",
     )
     policy_func_type = parser.parse_known_args()[0].policy_func_type
-    parser.add_argument("--policy_hidden_sizes", type=list, default=[256,256,256])
+    parser.add_argument("--policy_hidden_sizes", type=list, default=[64])
     parser.add_argument(
         "--policy_hidden_activation", type=str, default="gelu", help="Options: relu/gelu/elu/selu/sigmoid/tanh"
     )
@@ -151,7 +155,7 @@ if __name__ == "__main__":
     env = create_env(**args)
     args = init_args(env, **args)
 
-    #start_tensorboard(args["save_folder"])
+    start_tensorboard(args["save_folder"])
     # Step 1: create algorithm and approximate function
     alg = create_alg(**args)
     # Step 2: create sampler in trainer
@@ -170,6 +174,6 @@ if __name__ == "__main__":
 
     ################################################
     # Plot and save training figures
-    #plot_all(args["save_folder"])
+    plot_all(args["save_folder"])
     save_tb_to_csv(args["save_folder"])
     print("Plot & Save are finished!")

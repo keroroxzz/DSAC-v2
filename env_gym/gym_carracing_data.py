@@ -1,5 +1,5 @@
-import gym
-from gym.utils import seeding
+import gymnasium as gym
+from gymnasium.utils import seeding
 import numpy as np
 
 
@@ -36,7 +36,8 @@ class Env:
         a = action.copy()
         a[0] = a[0] * 2 - 1
         for i in range(self.action_repeat):
-            img_rgb, reward, die, info = self.env.step(a)
+            img_rgb, reward, t1, t2, info = self.env.step(a)
+            die = np.bitwise_or(t1, t2)
             total_reward += reward
 
             # If no reward recently, end the episode

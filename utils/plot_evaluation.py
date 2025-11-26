@@ -28,6 +28,7 @@ def self_plot(
     """
     Plot single figure containing several curves.
     """
+    return
     default_cfg = dict()
     default_cfg["fig_size"] = (12, 9)
     default_cfg["dpi"] = 300

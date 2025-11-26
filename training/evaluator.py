@@ -49,7 +49,8 @@ class Evaluator:
             action_distribution = self.networks.create_action_distributions(logits)
             action = action_distribution.mode()
             action = action.detach().numpy()[0]
-            next_obs, reward, done, next_info = self.env.step(action)
+            next_obs, reward, termination, truncation, next_info = self.env.step(action)
+            done = np.bitwise_or(termination, truncation)
             obs_list.append(obs)
             action_list.append(action)
             obs = next_obs

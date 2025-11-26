@@ -9,7 +9,8 @@ import numpy as np
 import seaborn as sns
 import torch
 import pandas as pd
-from gym import wrappers
+import gymnasium as gym
+from gymnasium import wrappers
 from copy import copy
 
 #from gops.create_pkg.create_env_model import create_env_model
@@ -131,6 +132,7 @@ class PolicyRunner:
             algs_name + self.env_id,
             datetime.datetime.now().strftime("%y%m%d-%H%M%S"),
         )
+        print(self.save_path)
         os.makedirs(self.save_path, exist_ok=True)
 
     def run_an_episode(
@@ -150,7 +152,7 @@ class PolicyRunner:
         step_list = []
         info_list = [init_info]
         obs, info = env.reset(**init_info)
-        state = env.state
+        state = obs
         print("Initial state: ")
         print(self.__convert_format(state))
         # plot tracking
@@ -188,15 +190,15 @@ class PolicyRunner:
                         state_with_ref_error["state-{}-error".format(i)].append(
                             info["ref"][i] - info["state"][i]
                         )
-            next_obs, reward, done, info = env.step(action)
-
+            next_obs, reward, termination, truncation, info = env.step(action)
+            done = np.bitwise_or(termination, truncation)
             action_list.append(action)
             step_list.append(step)
             reward_list.append(reward)
             info_list.append(info)
 
             obs = next_obs
-            state = env.state
+            state = next_obs
             step = step + 1
             print("step:", step)
 
@@ -557,7 +559,7 @@ class PolicyRunner:
             "obs_noise_type": self.obs_noise_type,
             "obs_noise_data": self.obs_noise_data,
             "action_noise_type": self.action_noise_type,
-            "action_noise_data": self.action_noise_data,
+            "action_noise_data": self.action_noise_data
         }
         env = create_env(**env_args)
         if self.save_render:
@@ -618,6 +620,7 @@ class PolicyRunner:
             eval_dict, tracking_dict = self.run_an_episode(
                 env, networks, self.init_info, is_opt=False, render=False
             )
+            env.close()
             print("Successfully run policy {}".format(i + 1))
             print("===========================================================\n")
             # mp4 to gif

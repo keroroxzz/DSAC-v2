@@ -66,7 +66,8 @@ class OffSampler:
             else:
                 action_clip = action
             # interact with environment
-            next_obs, reward, self.done, next_info = self.env.step(action_clip)
+            next_obs, reward, termination, truncation, next_info = self.env.step(action_clip)
+            self.done = np.bitwise_or(termination, truncation)
             if "TimeLimit.truncated" not in next_info.keys():
                 next_info["TimeLimit.truncated"] = False
             if next_info["TimeLimit.truncated"]:

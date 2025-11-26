@@ -11,8 +11,8 @@
 #  Update Date: 2021-05-55, Yuhang Zhang: create environment
 
 
-import gym
-from gym.utils import seeding
+import gymnasium as gym
+from gymnasium.utils import seeding
 import numpy as np
 
 
@@ -41,7 +41,8 @@ class Env(gym.Env):
         total_reward = 0
         a = action.copy()
         for i in range(self.action_repeat):
-            img_rgb, reward, die, info = self.env.step(a)
+            img_rgb, reward, t1, t2, info = self.env.step(a)
+            die = np.bitwise_or(t1, t2)
             total_reward += reward
 
             # If no reward recently, end the episode
